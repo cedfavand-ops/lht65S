@@ -98,6 +98,18 @@ footer {
     </article>
 
     <article class="card">
+      <div class="label">Température minimale (24 h)</div>
+      <div class="value"><span id="externalMin">--</span><span class="unit">°C</span></div>
+      <div class="note">Minimum de la sonde déportée</div>
+    </article>
+
+    <article class="card">
+      <div class="label">Température maximale (24 h)</div>
+      <div class="value"><span id="externalMax">--</span><span class="unit">°C</span></div>
+      <div class="note">Maximum de la sonde déportée</div>
+    </article>
+
+    <article class="card">
       <div class="label">Humidité relative</div>
       <div class="value"><span id="humidity">--</span><span class="unit">%</span></div>
       <div class="note">Humidité de l'air</div>
@@ -255,6 +267,19 @@ async function loadData() {
     const historyData = await historyResponse.json();
     const m = latestData.measurement;
     const measurements = historyData.measurements || [];
+
+    // Minimum et maximum de la sonde déportée sur les dernières 24 h
+    const externalTemps = measurements
+      .map(item => item.external_temperature)
+      .filter(value => value !== null && value !== undefined
+        && Number.isFinite(Number(value)))
+      .map(Number);
+
+    document.getElementById("externalMin").textContent =
+      externalTemps.length ? formatNumber(Math.min(...externalTemps), 2) : "--";
+
+    document.getElementById("externalMax").textContent =
+      externalTemps.length ? formatNumber(Math.max(...externalTemps), 2) : "--";
 
     if (m) {
       document.getElementById("temperature").textContent =
