@@ -1,208 +1,158 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suivi météo — LHT65S</title>
-
+<title>Suivi météo — LHT65N</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
 :root {
-  --bg: #101827;
-  --panel: #192438;
-  --border: #2b3a52;
-  --text: #edf4ff;
-  --muted: #91a4bf;
-  --blue: #63b3ff;
-  --cyan: #65e0dc;
+  --bg:#101827;
+  --panel:#192438;
+  --border:#2b3a52;
+  --text:#edf4ff;
+  --muted:#91a4bf;
+  --blue:#63b3ff;
+  --cyan:#65e0dc;
+  --orange:#ffbd69;
 }
-
-* { box-sizing: border-box; }
-
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
 }
-
 header {
-  padding: 28px 18px;
-  text-align: center;
-  background: #16243a;
-  border-bottom: 1px solid var(--border);
+  padding:30px 18px;
+  text-align:center;
+  background:#16243a;
+  border-bottom:1px solid var(--border);
 }
-
 header h1 {
-  margin: 0 0 8px;
-  font-size: clamp(23px, 4vw, 34px);
+  margin:0 0 9px;
+  font-size:clamp(24px,4vw,36px);
 }
-
-header p {
-  margin: 0;
-  color: var(--muted);
-}
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 22px 16px;
-}
-
-.status {
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 18px;
-}
-
+header p { margin:0; color:var(--muted); }
+.container { max-width:1150px; margin:auto; padding:22px 16px; }
+.status { color:var(--muted); font-size:13px; margin-bottom:18px; }
 .cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(205px,1fr));
+  gap:15px;
 }
-
-.card, .chart-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 22px;
+.card,.chart-card {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:21px;
+  min-width:0;
 }
-
-.label {
-  color: var(--muted);
-  font-size: 14px;
-}
-
+.label { color:var(--muted); font-size:14px; }
 .value {
-  font-size: 38px;
-  font-weight: bold;
-  margin: 15px 0 8px;
+  font-size:clamp(29px,4vw,38px);
+  font-weight:bold;
+  margin:17px 0 9px;
+  overflow-wrap:anywhere;
 }
-
-.unit {
-  font-size: 19px;
-  color: var(--blue);
-}
-
-.note {
-  color: var(--muted);
-  font-size: 12px;
-}
-
+.unit { font-size:19px; color:var(--blue); margin-left:4px; }
+.note { color:var(--muted); font-size:12px; line-height:1.5; }
 .charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));
+  gap:16px;
+  margin-top:20px;
 }
-
-.chart-card h2 {
-  font-size: 17px;
-  margin-top: 0;
-}
-
-.chart-container {
-  position: relative;
-  height: 260px;
-}
-
+.chart-card h2 { font-size:17px; margin:0 0 18px; }
+.chart-container { position:relative; height:280px; }
 footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12px;
-  padding: 25px 15px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  padding:25px 15px;
 }
 </style>
 </head>
-
 <body>
 
 <header>
-  <h1>🌡️ Suivi météo — LHT65S</h1>
-  <p>Surveillance d'un trou à froid</p>
+  <h1>🌡️ Suivi météo — LHT65N</h1>
+  <p>Surveillance d'un trou à froid · Données en direct</p>
 </header>
 
 <main class="container">
-
-  <div class="status" id="status">
-    Démonstration — données non connectées à TTN
-  </div>
+  <div class="status" id="status">Connexion à la station en cours…</div>
 
   <section class="cards">
+    <article class="card">
+      <div class="label">Température du capteur</div>
+      <div class="value"><span id="temperature">--</span><span class="unit">°C</span></div>
+      <div class="note">Température mesurée par le LHT65N</div>
+    </article>
 
     <article class="card">
-      <div class="label">Température</div>
-      <div class="value">
-        <span id="temperature">--.-</span>
-        <span class="unit">°C</span>
-      </div>
-      <div class="note">Dernière mesure reçue</div>
+      <div class="label">Température de la sonde externe</div>
+      <div class="value"><span id="externalTemperature">--</span><span class="unit">°C</span></div>
+      <div class="note">Sonde de température déportée</div>
     </article>
 
     <article class="card">
       <div class="label">Humidité relative</div>
-      <div class="value">
-        <span id="humidity">--</span>
-        <span class="unit">%</span>
-      </div>
+      <div class="value"><span id="humidity">--</span><span class="unit">%</span></div>
       <div class="note">Humidité de l'air</div>
     </article>
 
     <article class="card">
       <div class="label">Batterie</div>
-      <div class="value">
-        <span id="battery">--</span>
-        <span class="unit">V</span>
-      </div>
-      <div class="note">Tension mesurée, si disponible</div>
+      <div class="value"><span id="battery">--</span><span class="unit">V</span></div>
+      <div class="note">Tension de la batterie, si disponible</div>
     </article>
 
     <article class="card">
       <div class="label">Dernière réception</div>
-      <div class="value" style="font-size:23px" id="lastUpdate">
-        En attente
-      </div>
-      <div class="note">Heure du dernier message</div>
+      <div class="value" style="font-size:21px" id="lastUpdate">En attente</div>
+      <div class="note">Heure du dernier message reçu</div>
     </article>
-
   </section>
 
   <section class="charts">
-
     <article class="chart-card">
-      <h2>Évolution de la température</h2>
+      <h2>Évolution des températures — 24 h</h2>
       <div class="chart-container">
         <canvas id="temperatureChart"></canvas>
       </div>
     </article>
 
     <article class="chart-card">
-      <h2>Évolution de l'humidité</h2>
+      <h2>Évolution de l'humidité — 24 h</h2>
       <div class="chart-container">
         <canvas id="humidityChart"></canvas>
       </div>
     </article>
-
   </section>
-
 </main>
 
 <footer>
-  Suivi LoRaWAN · Dragino LHT65S · Données à connecter
+  Suivi LoRaWAN · Dragino LHT65N · Actualisation automatique toutes les minutes
 </footer>
 
 <script>
+const API = "https://lht65s-api.cedfavand.workers.dev";
+
 const commonOptions = {
   responsive: true,
   maintainAspectRatio: false,
   animation: false,
+  interaction: { intersect: false, mode: "index" },
   plugins: {
-    legend: { display: false }
+    legend: {
+      labels: { color: "#edf4ff" }
+    }
   },
   scales: {
     x: {
-      ticks: { color: "#91a4bf", maxTicksLimit: 6 },
+      ticks: { color: "#91a4bf", maxTicksLimit: 7 },
       grid: { color: "#2b3a52" }
     },
     y: {
@@ -212,21 +162,10 @@ const commonOptions = {
   }
 };
 
-function createChart(id, label, color, unit) {
+function createChart(id, datasets, unit) {
   return new Chart(document.getElementById(id), {
     type: "line",
-    data: {
-      labels: [],
-      datasets: [{
-        label: label,
-        data: [],
-        borderColor: color,
-        backgroundColor: color,
-        borderWidth: 2,
-        pointRadius: 2,
-        tension: 0.25
-      }]
-    },
+    data: { labels: [], datasets },
     options: {
       ...commonOptions,
       scales: {
@@ -244,14 +183,142 @@ function createChart(id, label, color, unit) {
   });
 }
 
-const temperatureChart = createChart(
-  "temperatureChart", "Température", "#63b3ff", "°C"
-);
+const temperatureChart = createChart("temperatureChart", [
+  {
+    label: "Capteur",
+    data: [],
+    borderColor: "#63b3ff",
+    backgroundColor: "#63b3ff",
+    borderWidth: 2,
+    pointRadius: 2,
+    tension: 0.25,
+    spanGaps: true
+  },
+  {
+    label: "Sonde externe",
+    data: [],
+    borderColor: "#ffbd69",
+    backgroundColor: "#ffbd69",
+    borderWidth: 2,
+    pointRadius: 2,
+    tension: 0.25,
+    spanGaps: true
+  }
+], "°C");
 
-const humidityChart = createChart(
-  "humidityChart", "Humidité", "#65e0dc", "%"
-);
+const humidityChart = createChart("humidityChart", [
+  {
+    label: "Humidité",
+    data: [],
+    borderColor: "#65e0dc",
+    backgroundColor: "#65e0dc",
+    borderWidth: 2,
+    pointRadius: 2,
+    tension: 0.25,
+    spanGaps: true
+  }
+], "%");
+
+function formatNumber(value, digits = 1) {
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+    return "--";
+  }
+  return Number(value).toFixed(digits);
+}
+
+function formatTime(value) {
+  if (!value) return "--";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "--";
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+async function loadData() {
+  const status = document.getElementById("status");
+
+  try {
+    const [latestResponse, historyResponse] = await Promise.all([
+      fetch(`${API}/api/latest`),
+      fetch(`${API}/api/history`)
+    ]);
+
+    if (!latestResponse.ok || !historyResponse.ok) {
+      throw new Error("L'API a renvoyé une erreur.");
+    }
+
+    const latestData = await latestResponse.json();
+    const historyData = await historyResponse.json();
+    const m = latestData.measurement;
+    const measurements = historyData.measurements || [];
+
+    if (m) {
+      document.getElementById("temperature").textContent =
+        formatNumber(m.temperature, 2);
+
+      document.getElementById("externalTemperature").textContent =
+        formatNumber(m.external_temperature, 2);
+
+      document.getElementById("humidity").textContent =
+        formatNumber(m.humidity, 1);
+
+      document.getElementById("battery").textContent =
+        formatNumber(m.battery, 3);
+
+      document.getElementById("lastUpdate").textContent =
+        formatTime(m.received_at);
+    } else {
+      document.getElementById("lastUpdate").textContent = "Aucune donnée";
+    }
+
+    temperatureChart.data.labels = measurements.map(
+      item => formatTime(item.received_at)
+    );
+
+    temperatureChart.data.datasets[0].data = measurements.map(
+      item => item.temperature == null ? null : Number(item.temperature)
+    );
+
+    temperatureChart.data.datasets[1].data = measurements.map(
+      item => item.external_temperature == null
+        ? null
+        : Number(item.external_temperature)
+    );
+
+    temperatureChart.update();
+
+    humidityChart.data.labels = measurements.map(
+      item => formatTime(item.received_at)
+    );
+
+    humidityChart.data.datasets[0].data = measurements.map(
+      item => item.humidity == null ? null : Number(item.humidity)
+    );
+
+    humidityChart.update();
+
+    const now = new Date().toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    status.textContent = m
+      ? `Station connectée · ${measurements.length} mesures sur 24 h · Actualisé à ${now}`
+      : "Aucune mesure reçue dans les dernières 24 heures.";
+
+  } catch (error) {
+    console.error(error);
+    status.textContent =
+      "Impossible de charger les données. Vérifiez la connexion à l'API.";
+  }
+}
+
+loadData();
+setInterval(loadData, 60000);
 </script>
-
 </body>
 </html>
